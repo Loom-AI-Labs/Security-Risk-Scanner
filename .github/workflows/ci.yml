@@ -1,0 +1,67 @@
+name: Package verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - run: npm run validate
+
+  installer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DISABLE_TELEMETRY: '1'
+      DO_NOT_TRACK: '1'
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Install the shared skill for both hosts in a temporary project
+        shell: bash
+        run: |
+          project="$(mktemp -d)"
+          cd "$project"
+          npx --yes skills@1.7.6 add "$GITHUB_WORKSPACE" --skill security-risk-review -a codex claude-code -y
+          test -f .agents/skills/security-risk-review/SKILL.md
+          test -f .claude/skills/security-risk-review/SKILL.md
+          cmp .agents/skills/security-risk-review/LICENSE "$GITHUB_WORKSPACE/LICENSE"
+          cmp .claude/skills/security-risk-review/NOTICE "$GITHUB_WORKSPACE/NOTICE"
+
+  claude-manifests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Validate Claude marketplace and plugin without signing in
+        env:
+          DISABLE_TELEMETRY: '1'
+          DISABLE_ERROR_REPORTING: '1'
+        run: npx --yes @anthropic-ai/claude-code@2.1.319 plugin validate .

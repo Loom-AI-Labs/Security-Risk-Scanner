@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "security-risk-scanner",
+  "version": "0.1.0",
+  "description": "Evidence-led, phased security reviews for Java/JVM and Node.js/TypeScript projects.",
+  "author": { "name": "Loom AI Labs", "url": "https://loomai.pro" },
+  "homepage": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner#readme",
+  "repository": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner",
+  "license": "Apache-2.0",
+  "keywords": ["security", "code-review", "java", "nodejs", "authorization", "agent-skills"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Security Risk Scanner",
+        "shortDescription": "Evidence-led security reviews for Java and Node.js",
+        "longDescription": "Review selected files, diffs, or bounded project phases using 18 risk playbooks. Trace controls before reporting findings; keep uncertainty and coverage limitations visible.",
+        "developerName": "Loom AI Labs",
+        "category": "Productivity",
+        "websiteURL": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner",
+        "defaultPrompt": ["Review this project in phased, report-only mode using security-risk-review."]
+      }
+    }
+  }
+}

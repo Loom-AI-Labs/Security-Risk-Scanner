@@ -1,0 +1,12 @@
+{
+  "name": "loom-ai-labs-security",
+  "interface": { "displayName": "Loom AI Labs Security" },
+  "plugins": [
+    {
+      "name": "security-risk-scanner",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE" },
+      "category": "Productivity"
+    }
+  ]
+}

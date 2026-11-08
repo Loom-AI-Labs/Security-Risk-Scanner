@@ -1,0 +1,302 @@
+{
+  "samples": [
+    {
+      "sample": "sample-01.txt",
+      "disposition": "finding",
+      "riskIds": ["R01"],
+      "reason": "Line 1: a caller-controlled Authorization token is decoded without verification, and its sub selects the account returned by accounts.get. Unverified claims therefore become the identity for a protected account read. No signature, trusted issuer/audience check, or independent principal is present in this self-contained route; this is an identity-acceptance failure, not merely an incidental decode call.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-02.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R01"],
+      "reason": "Line 1: jwt.verify with a trusted key, explicit RS256 algorithm, issuer, and audience precedes the account lookup. The lookup uses the verified subject rather than a caller-selected account ID. The decode-only identity-adoption path is absent; this does not independently certify every token lifecycle or claim requirement for an unspecified JWT library/version.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-03.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R02"],
+      "reason": "Lines 1-2: after resolving the requested document, requireOwner compares the current user's ID with that document's owner and, under the explicit fixture contract, throws on inequality before body() is returned. This protects the actual document-to-reader boundary. A missing controller annotation does not negate this effective guard, and the internal lookup alone does not demonstrate disclosure.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-04.txt",
+      "disposition": "finding",
+      "riskIds": ["R02"],
+      "reason": "Line 1: the path-variable ID directly selects a document whose body is returned, although the stated contract permits authenticated users to read only their own documents. No owner predicate or guard binds that object to the current user. A user able to name another user's document therefore crosses the object-read boundary; authentication alone would not repair it.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-05.txt",
+      "disposition": "conditional",
+      "riskIds": ["R02"],
+      "reason": "Line 1: a cache hit keyed only by id returns before the verified-tenant database predicate. If the cache is shared across tenants, a requester naming another tenant's warmed document ID could receive that document without the tenant check. Cache lifetime/namespace and cross-tenant availability of entries are not specified; a tenant-local cache would defeat this trace. Global uniqueness of document IDs alone would not protect a shared cache hit. Needs validation, not confirmed disclosure.",
+      "confidence": "medium"
+    },
+    {
+      "sample": "sample-06.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R02"],
+      "reason": "Line 1: both the serialized cache key and the database predicate include ctx.verifiedTenant together with the document ID. Consequently a tenant cannot reuse another tenant's cached entry merely by supplying its ID, even with a shared cache. No stale-membership or finer-grained per-user authorization contract is supplied from which to establish another violation.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-07.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R02", "R03", "R17"],
+      "reason": "Line 1: operator ownership and quota checks throw on denial before provisioning and are explicitly not bypassed. Only optional capacity planning can be skipped when unavailable. This fallback does not turn a failed security authorization into permission, and no separate attacker-driven resource amplification beyond the enforced contract is demonstrated. Optional operational availability must not be conflated with actor/resource authority.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-08.txt",
+      "disposition": "finding",
+      "riskIds": ["R02", "R03"],
+      "reason": "Line 1: mayRead substitutes true for every exception from securityPdp.allowed(a,d). During a PDP failure, the actor/document authorization decision becomes an unconditional permit without a valid security decision. This is a source-confirmed fail-open policy result, unlike optional capacity bypass; the excerpt establishes the faulty permission contract, not an observed downstream document disclosure or attacker-induced outage.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-09.txt",
+      "disposition": "conditional",
+      "riskIds": ["R04"],
+      "reason": "Line 1: an authenticated user supplies the entire update object to users.update for their own row, and the model contains role and tenantId. Those fields would cross the server-owned privilege/tenant-state boundary if the helper persists them from the body. The helper's field allowlist, hooks, and persistence semantics are absent, so arbitrary protected-field assignment is not established. Inspect that exact mapping before confirming mass assignment.",
+      "confidence": "medium"
+    },
+    {
+      "sample": "sample-10.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R04"],
+      "reason": "Line 1: the update target comes from req.user.id and the constructed update contains only displayName. Body-supplied role or tenantId properties never enter the update argument, consistent with the explicit non-writable-field contract. The generic helper call therefore does not demonstrate protected-field assignment; no sensitive response property is identified either.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-11.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R05"],
+      "reason": "Line 1: the SQL statement has fixed syntax and supplies input separately as the value bound to ?. Under the shown JDBC queryForList contract, search text remains data rather than executable SQL syntax. This resolves the injection lead only; it is not evidence about unrelated product-row authorization requirements.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-12.txt",
+      "disposition": "finding",
+      "riskIds": ["R05"],
+      "reason": "Line 1: the search caller's input is concatenated inside a SQL literal before queryForList executes the completed statement. A caller supplying search text can alter SQL structure instead of remaining a bound value; no binding or other syntax-preserving control intervenes. This confirms the source-level injection path for untrusted search input, not a measured production database compromise or a particular database privilege.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-13.txt",
+      "disposition": "finding",
+      "riskIds": ["R05"],
+      "reason": "Line 1: req.body.host is concatenated into the command string passed to Node exec, whose shell parses that string. The request caller can therefore turn host data into shell syntax and invoke unintended commands with the service process's authority. The fixed ping prefix does not constrain subsequent shell syntax; no escaping, validation, or shell-free argument boundary appears.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-14.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R05"],
+      "reason": "Line 1: an authenticated route executes a fixed absolute executable with the fixed --version argument and shell:false. Neither executable selection, arguments, nor shell syntax is caller-controlled. A process API by itself does not establish injection, and this excerpt provides no attacker-controlled program-option path.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-15.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R06"],
+      "reason": "Line 1: the outbound scheme, authority, and path are fixed by the application, and redirects are rejected. The preview caller cannot select another network destination through this code. No attacker-controlled destination or other demonstrated SSRF boundary crossing follows merely from using fetch; DNS compromise or upstream content compromise is not supplied as a premise.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-16.txt",
+      "disposition": "finding",
+      "riskIds": ["R06"],
+      "reason": "Line 1: the public preview caller supplies the complete URL to the server's fetch and receives its response text, with destination/network restrictions explicitly absent. This delegates the service's outbound network capability to caller-selected destinations without an egress boundary. The finding is unrestricted server-side destination control; actual access to a particular private service, metadata endpoint, or credential is not established.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-17.txt",
+      "disposition": "finding",
+      "riskIds": ["R07"],
+      "reason": "Line 1: explicitly untrusted chat text reaches dangerouslySetInnerHTML directly, without sanitization or isolation. A chat-content author can supply active HTML that runs browser behavior in the origin of a reader rendering this component, crossing the content-to-browser-authority boundary. The claim is not that every inserted script element executes, nor that a particular victim session was compromised.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-18.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R07"],
+      "reason": "Line 1: text is an ordinary React child in a div, not raw HTML. React renders string content as text with markup escaping, so attacker-supplied markup does not acquire active HTML behavior through the shown sink. There is no subsequent decoding or raw rendering path in this excerpt.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-19.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R08"],
+      "reason": "Line 1: the route requires a verified bearer in Authorization, never accepts cookies, and uses that bearer's subject for the email change. A hostile origin cannot rely on automatically attached session cookies to authorize the effect; attacker origins are also denied by CORS. Missing cookie-oriented CSRF tokens is therefore not a confirmed CSRF defect. The decisive protection is the non-ambient authentication contract, not CORS alone.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-20.txt",
+      "disposition": "finding",
+      "riskIds": ["R08"],
+      "reason": "Line 1: a form-compatible POST changes the victim's email using ambient cookie-session identity. The stated SameSite=None cross-site cookie contract allows a hostile site's form request to carry that authority in browsers permitting those cookies, while no Origin or CSRF check establishes victim intent before the write. Reading the response is unnecessary for the unauthorized state change.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-21.txt",
+      "disposition": "finding",
+      "riskIds": ["R09"],
+      "reason": "Line 1: an authenticated caller controls an unrestricted name passed to path.resolve and then sendFile. Resolution makes an absolute path but does not enforce containment beneath /srv/uploads; traversal or an absolute input can select readable private files outside that directory, which the premise explicitly makes accessible to the process. Authentication does not authorize those filesystem reads.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-22.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R02", "R09"],
+      "reason": "Line 1: the caller supplies a logical object ID, requireOwnedObject resolves it against req.user.id, and sendFile uses the returned trusted path. The explicit immutable, application-owned, upload-directory resolution contract removes direct caller path control and protects object ownership before bytes are sent. Neither traversal nor another user's download is demonstrated under those premises.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-23.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R10"],
+      "reason": "Line 1: the actual factory disallows DOCTYPE and denies external DTD/schema access before parsing. Unsupported settings abort rather than silently continuing, and the fixture specifies a trusted runtime using the documented factory. This blocks the external-entity path in scope. It does not certify every XML resource bound or an unrelated parser/provider configuration.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-24.txt",
+      "disposition": "finding",
+      "riskIds": ["R10"],
+      "reason": "Line 1: attacker-controlled XML is parsed with a factory explicitly stated to resolve external entities by default, without a resolver or external-access restriction. Attacker-chosen entity references can therefore acquire the parser process's file/network authority, and resolved entity text can enter the returned text content. The finding relies on the supplied provider behavior, not an assumed universal JAXP default or an observed read of a particular private file.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-25.txt",
+      "disposition": "finding",
+      "riskIds": ["R06", "R11"],
+      "reason": "Line 1: an authenticated caller chooses req.query.url, and fetch attaches the internal-service bearer token to that initial destination without binding it to its intended peer. With the configured token present, a caller-selected server receives a credential meant for the internal service; no redirect behavior is needed for this disclosure. This crosses both destination and credential-audience boundaries. Token validity and any particular internal-network reachability were not tested.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-26.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R06", "R11"],
+      "reason": "Line 1: the service token is sent to an application-fixed HTTPS service/export destination, redirects are rejected, and the caller cannot replace the peer. This does not demonstrate arbitrary credential forwarding or SSRF. The export's data classification and per-object access contract are not specified, so no separate unauthorized export is inferred from the response alone.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-27.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R12"],
+      "reason": "Line 1: MD5 is explicitly used only for non-security cache invalidation of public images, never authentication or integrity authority. No protected secrecy, authenticity, or password-resistance promise depends on collision resistance here. An algorithm keyword without a security-sensitive purpose is not a confirmed cryptographic vulnerability.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-28.txt",
+      "disposition": "finding",
+      "riskIds": ["R12"],
+      "reason": "Line 1: the shown password-hashing function produces a single deterministic, unsalted MD5 digest, rather than a salted adaptive password verifier. For its stated password purpose, disclosure of the returned verifier permits inexpensive offline guessing and cross-account/precomputed comparisons, violating password-guessing resistance. This is not a collision-based claim, proof of a deployed password database leak, or a recommendation of unverified current KDF cost numbers.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-29.txt",
+      "disposition": "finding",
+      "riskIds": ["R11", "R13"],
+      "reason": "Line 1: middleware copies the entire credential-bearing Authorization header to console without redaction, and the stated collector places it in ordinary support diagnostics. Authentication capability is thereby copied from the verifier's input into diagnostic storage/audience instead of minimized audit metadata. This establishes a source-defined secret exposure path; it does not establish a public log store, active stolen token, or an actual support reader's misuse.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-30.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R13"],
+      "reason": "Line 1: the structured event includes only request ID and method, not Authorization, body content, or another identified secret/private field. No unauthorized diagnostic disclosure or downstream log-integrity effect is shown. An opaque correlation ID is not automatically an authentication credential or proof of a privacy violation.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-31.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R14"],
+      "reason": "Lines 1-8: PR code is built under a pull_request trigger with read-only permissions, and the premise explicitly excludes privileged deployment credentials and publishing authority. Untrusted code execution is the purpose of this validation job; the excerpt does not show it acquiring a privileged release effect, host capability, or trusted artifact promotion. A mutable checkout action tag alone is a hardening lead, not confirmed compromise.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-32.txt",
+      "disposition": "finding",
+      "riskIds": ["R11", "R14"],
+      "reason": "Lines 1, 4, and 6-11: a pull_request_target job with write-all permissions checks out the PR author's head SHA and executes its npm build while exposing a deployment secret. Once such a job runs, PR-controlled build code crosses into the target repository's privileged credential context and can exercise those privileges or disclose the secret. This is a configuration-confirmed trust crossing, not a claim that hosted approvals permit every PR to run or that a real secret was accessed.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-33.txt",
+      "disposition": "finding",
+      "riskIds": ["R15"],
+      "reason": "Lines 2-6: the public web workload is privileged and has a writable host Docker socket. The excerpt supplies command injection as an existing prerequisite, giving an attacker process execution that can reach the daemon API rather than remaining confined to web-app authority. This exposes host/container-management capability and materially breaks workload isolation; it is a source-configuration chain, not proof that this configuration is live or that host takeover was executed.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-34.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R15"],
+      "reason": "Lines 1-3: USER root establishes container UID, but the fixture explicitly provides no host mounts or capabilities and shows no isolation escape or attacker-controlled host-management operation. Root-in-container can warrant least-privilege hardening, but the word root alone does not demonstrate host compromise or another concrete crossed boundary in this excerpt.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-35.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R16"],
+      "reason": "Line 1: raw request bytes and the provider signature go through the maintained verifier before event processing; the premise also states that applyVerifiedEvent checks order binding. dedup.once surrounds application of the verified event. No unsigned callback-to-payment transition is shown. Exact verifier freshness and deduplication atomicity cannot be certified from opaque helpers, but there is no demonstrated replay interleaving or other specific failure to confirm.",
+      "confidence": "medium"
+    },
+    {
+      "sample": "sample-36.txt",
+      "disposition": "finding",
+      "riskIds": ["R16"],
+      "reason": "Line 1: an unauthenticated public caller supplies orderId and immediately causes orders.markPaid, with no other authentication by explicit premise. Caller JSON is therefore promoted to payment-provider authority and a protected paid-state transition without a verified event or binding. No real purchase, provider account, or callback was used to establish this source-level forgery path.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-37.txt",
+      "disposition": "finding",
+      "riskIds": ["R17"],
+      "reason": "Line 1: an anonymous caller controls the ids array, which starts one model query per element concurrently through Promise.all. The premise rules out body, item-count, concurrency, and token limits anywhere. A small number of requests can therefore drive unbounded fan-out, outstanding work, and provider resource/spend consumption outside a bounded admission contract. No throughput, monetary amount, or successful production exhaustion is claimed.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-38.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R17"],
+      "reason": "Line 1: body limiting runs first, admission is checked before model work, the parsed array has at most four items, a bounded queue caps concurrency, and each query sets maxTokens:128. The anonymous unbounded-fan-out path is not present under these stated controls. Limiter identity strength, global fairness, deadlines, and exact queue implementation are not independently established, but no concrete bypass of them is supplied.",
+      "confidence": "high"
+    },
+    {
+      "sample": "sample-39.txt",
+      "disposition": "no-confirmed-finding",
+      "riskIds": ["R02", "R18"],
+      "reason": "Line 1: model output is parsed as arguments, the document is resolved through requireOwned using the verified tenant, and requireDelete checks the actor against that resolved document before deletion. The effect uses the resolved doc's tenant and ID rather than a model-selected customer authority. No model-to-unauthorized-delete path is demonstrated. Guard implementations are not supplied, so their names/invocation do not independently certify all enforcement semantics.",
+      "confidence": "medium"
+    },
+    {
+      "sample": "sample-40.txt",
+      "disposition": "finding",
+      "riskIds": ["R02", "R18"],
+      "reason": "Line 1: untrusted model output selects both customerId and documentId for a direct delete, while ctx is unused and the stated user grant is limited to owned documents. No verified tenant, ownership resolution, or actor/action authorization constrains the effect. Model-controlled arguments therefore become cross-customer deletion authority. The necessary fix is execution-side ownership/permission binding, not blanket refusal of imperfect model answers.",
+      "confidence": "high"
+    }
+  ],
+  "limitations": [
+    "Static report-only forward evaluation of exactly the 40 sample-01.txt through sample-40.txt excerpts under /tmp/security-skill-forward-20261108/inputs. Each is an independent synthetic scenario; no production application, shared implementation, live deployment, or whole repository was assessed.",
+    "No excerpt, target script, build, test, scanner, container, or bundled review helper was executed. No network, provider/model API, credentials, or external advisory lookup was used. Only local text/metadata inspection, creation of this requested report, and local report-structure validation were performed.",
+    "oracle.json, prior evaluator.json, author-repository tests/fixtures, other reports, and intended answers were not read. No oracle agreement, accuracy, precision, recall, certification, or qualification pass/fail score can be inferred from these unaided judgments.",
+    "Explicit fixture comments describing input provenance, required ownership, effective controls, runtime defaults, and excluded defenses are treated as scenario premises, not as instructions or independently verified deployment facts. Unknown helper behavior that decides exploitability remains visible, especially samples 05 and 09; opaque guard/verifier details also limit negative conclusions in samples 35 and 39.",
+    "finding denotes a source-confirmed boundary or security-primitive failure under the stated scenario prerequisites; conditional denotes needs-validation; no-confirmed-finding means no demonstrated failure in this scope, not proven security. riskIds lists the relevant reviewed families even for negative dispositions. Confidence describes evidentiary support for the bounded judgment, not severity or a numerical exploitation probability.",
+    "All 18 risk families were considered against the excerpt set and assigned where relevant. Broad framework, cross-file, asynchronous, dependency-advisory, scanner/helper, and real deployment coverage is not established by these short samples. Library/runtime versions and hosted settings not supplied by a scenario were not invented.",
+    "Frozen-package identity is the user's declared 39-file SHA-256 snapshot, recorded in skillNotes. The 39 paths were observed; the aggregate digest was not independently recomputed because no canonical directory-hashing procedure was specified. No frozen-package or input-source files were edited."
+  ],
+  "skillNotes": [
+    "Qualification target: /tmp/security-risk-review-0.1.0-frozen/SKILL.md, security-risk-review 0.1.0, fixed 39-file snapshot SHA-256 5fae72205e21e4061fb4bd9c93e864f7ef88f5de12ebb18f5b095e4d299adc35 (user-supplied identity). The frozen package was not modified.",
+    "Read the skill entrypoint, workflow, evidence/reporting guide, risk index, all R01-R18 detailed cards, Java and Node adapters, tool contract/offline guidance, source-registry metadata, and selected-files/challenge prompt guidance. No external source URL was opened. Manual source tracing was used; helper implementations and unrelated execution/fix templates were not behaviorally qualified.",
+    "Useful guidance: the evidence guide explicitly calibrates unknown users.update behavior and tenant-cache scope; R02/R03 distinguish shared guards and optional capacity from authorization; R12 separates checksum purpose from password resistance; R18 requires a real authority boundary instead of treating model imperfection as a vulnerability. These distinctions were directly usable without executing anything.",
+    "Usability gap: evidence-and-reporting.md mandates a large per-finding contract and its minimal JSON has findings/candidates/coverage, but no compact per-excerpt disposition format or defined negative-result record. Add an optional bounded-triage schema with finding/conditional/no-confirmed-finding, location, decisive boundary, missing premise, and a documented mapping to source-confirmed/needs-validation. This run used the user's schema rather than a native skill format.",
+    "Usability gap: confidence calibration is primarily phrased around vulnerability traces; it does not clearly separate confidence that no failure was demonstrated from assurance that a control is correct. Add negative-result examples for opaque requireOwned/requireDelete and verifier/dedup helpers, defining when to report high-confidence scoped dismissal versus medium-confidence insufficient implementation evidence. Samples 35 and 39 expose this distinction.",
+    "Usability gap: the guidance correctly rejects safe-looking method names as proof, but has no explicit evidence rubric for self-contained synthetic excerpts whose comments supply control/runtime contracts while helper implementations are intentionally absent. Add a scenario-premise ledger distinguishing explicit supplied guarantees, inferred helper semantics, inspected implementations, and unknown deployment facts. This would make treatment of samples 03, 22, 35, 38, and 39 more reproducible without weakening real-project tracing requirements.",
+    "Usability gap: the offline policy is sound, but sources.json supplies URLs, reviewedAt values, and narrative notes rather than preserved version-specific behavior evidence. The stack adapters also include rolling documentation links. Add a small versioned local behavior/provenance record for decisive JWT, XML-provider, outbound-client, and CI event/permission semantics, with explicit unknown states. This would improve offline reproducibility without pretending the package is an evergreen advisory database."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "security-risk-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable, evidence-led security review skill for Java and Node.js projects",
+  "license": "Apache-2.0",
+  "author": "Loom AI Labs",
+  "homepage": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner.git"
+  },
+  "bugs": { "url": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner/issues" },
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate-package.mjs",
+    "inventory": "node skills/security-risk-review/scripts/inventory.mjs",
+    "discover": "node skills/security-risk-review/scripts/discover.mjs"
+  }
+}

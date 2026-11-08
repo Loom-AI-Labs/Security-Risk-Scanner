@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "families": [
+    {"id":"R01","name":"Identity, sessions, tokens","card":"risks/r01-identity.md","surfaces":["login","session","JWT","OAuth","service identity"]},
+    {"id":"R02","name":"Authorization and tenant isolation","card":"risks/r02-authorization.md","surfaces":["private resources","tenants","roles","async jobs","exports"]},
+    {"id":"R03","name":"Distributed policy and context","card":"risks/r03-distributed-policy.md","surfaces":["PDP","gateway","trusted headers","authorization cache"]},
+    {"id":"R04","name":"API fields and mass assignment","card":"risks/r04-api-fields.md","surfaces":["binding","serialization","DTO","GraphQL fields"]},
+    {"id":"R05","name":"Interpreter injection","card":"risks/r05-injection.md","surfaces":["SQL","NoSQL","shell","templates","expression","LDAP"]},
+    {"id":"R06","name":"SSRF and outbound control","card":"risks/r06-ssrf.md","surfaces":["fetch","callback","import URL","proxy"]},
+    {"id":"R07","name":"XSS and rendering","card":"risks/r07-xss.md","surfaces":["HTML","Markdown","DOM","model output"]},
+    {"id":"R08","name":"Browser trust boundaries","card":"risks/r08-browser-boundaries.md","surfaces":["CSRF","CORS","postMessage","redirect","cookies"]},
+    {"id":"R09","name":"Files and storage","card":"risks/r09-files-storage.md","surfaces":["upload","download","object storage","archive","path"]},
+    {"id":"R10","name":"Parsers and object construction","card":"risks/r10-parsers.md","surfaces":["deserialization","XML","YAML","prototype pollution"]},
+    {"id":"R11","name":"Secrets","card":"risks/r11-secrets.md","surfaces":["credentials","environment","CI secrets","forwarded token"]},
+    {"id":"R12","name":"Cryptography and passwords","card":"risks/r12-cryptography.md","surfaces":["password","encryption","signature","nonce","token generation"]},
+    {"id":"R13","name":"Privacy and diagnostics","card":"risks/r13-privacy-diagnostics.md","surfaces":["logs","errors","debug","retention","support export"]},
+    {"id":"R14","name":"Supply chain and CI","card":"risks/r14-supply-chain.md","surfaces":["dependencies","lockfile","workflow","artifact","build input"]},
+    {"id":"R15","name":"Infrastructure configuration","card":"risks/r15-infrastructure.md","surfaces":["Docker","IaC","proxy","TLS","ports","privilege"]},
+    {"id":"R16","name":"Workflow, webhooks, races","card":"risks/r16-workflows-webhooks.md","surfaces":["state machine","signature","replay","transaction","idempotency"]},
+    {"id":"R17","name":"Resource abuse","card":"risks/r17-resource-abuse.md","surfaces":["limits","fanout","retry","model budget","public workload"]},
+    {"id":"R18","name":"AI and agent boundaries","card":"risks/r18-ai-boundaries.md","surfaces":["RAG","tool","MCP","model output","delegated authority"]}
+  ]
+}

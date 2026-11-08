@@ -1,0 +1,10 @@
+{
+  "name": "security-risk-scanner",
+  "version": "0.1.0",
+  "description": "Evidence-led, phased security reviews for Java/JVM and Node.js/TypeScript projects.",
+  "author": { "name": "Loom AI Labs", "url": "https://loomai.pro" },
+  "homepage": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner#readme",
+  "repository": "https://github.com/Loom-AI-Labs/Security-Risk-Scanner",
+  "license": "Apache-2.0",
+  "keywords": ["security", "code-review", "java", "nodejs", "authorization", "agent-skills"]
+}

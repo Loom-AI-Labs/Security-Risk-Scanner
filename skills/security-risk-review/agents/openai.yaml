@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Risk Review"
+  short_description: "Evidence-led security review for Java and Node"
+  default_prompt: "Use $security-risk-review for a scoped, report-only security review with evidence and explicit coverage limits."

@@ -1,0 +1,12 @@
+{
+  "name": "loom-ai-labs-security",
+  "owner": { "name": "Loom AI Labs" },
+  "metadata": { "description": "Evidence-led security review skills from Loom AI Labs." },
+  "plugins": [
+    {
+      "name": "security-risk-scanner",
+      "source": "./",
+      "description": "Phased security reviews for Java/JVM and Node.js/TypeScript projects."
+    }
+  ]
+}
