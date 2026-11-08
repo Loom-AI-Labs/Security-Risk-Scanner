@@ -118,6 +118,28 @@ The same path/NUL/content/NUL hash procedure applies.
   tag/version agreement, reruns tests, and publishes only tracked source with
   checksums. A workflow file alone is not evidence that its hosted run passed.
 
+### Public Repository Verification
+
+The public candidate commit `02f6f7840d108605e842b12de05d95351292ed11` passed
+[all five hosted verification jobs](https://github.com/Loom-AI-Labs/Security-Risk-Scanner/actions/runs/42474843029):
+tests and package validation on Node 20, 22, and 24; direct installation for both
+agents through Skills CLI; and Claude marketplace/plugin manifest validation.
+
+Fresh temporary environments then fetched the public repository, rather than
+installing from the author's checkout:
+
+- `skills@1.7.6 add Loom-AI-Labs/Security-Risk-Scanner` installed the one shared
+  skill for Codex and Claude Code.
+- Codex registered the GitHub marketplace at `main` and installed the plugin.
+- Claude registered the GitHub Git URL with `#main` and installed the plugin.
+- All three public-source installation routes produced the exact 41-file payload
+  hash recorded above. No model call, target application execution, or credentials
+  were needed to verify installation. Node/host versions are recorded above.
+
+GitHub private vulnerability reporting is enabled. Release-pinned installation
+and downloadable archive verification are post-tag checks; this candidate
+evidence does not claim an uncreated tag was already installed.
+
 Repository-hosted catalogs and release artifacts are not listings in the official
 OpenAI or Anthropic directories. No source upload or live target-project security
 testing occurs as part of a skill installation.

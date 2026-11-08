@@ -32,8 +32,9 @@ application should go to that application's owner, not this public repository.
 
 ## Reporting Problems In This Package
 
-For a security defect in this skill or its helpers, use the repository's private
-vulnerability-reporting option when available. If it is unavailable, open a public
+For a security defect in this skill or its helpers, use
+[private vulnerability reporting](https://github.com/Loom-AI-Labs/Security-Risk-Scanner/security/advisories/new),
+which is enabled on this repository. If it is unavailable, open a public
 issue requesting a private contact without including exploit details, customer
 source, credentials, or confidential reports. No response-time SLA is promised.
 
